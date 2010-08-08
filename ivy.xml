@@ -1,0 +1,13 @@
+<ivy-module version="2.0">
+	<!-- Author: Russell Francis -->
+	<info organisation="yuicompressor" module="yuicompressor-anttask"/>
+	<configurations defaultconfmapping="buildtime->*;runtime->*;testtime->*;deploytime->*;">
+        <conf name="runtime"/>
+        <conf name="buildtime"/>
+        <conf name="testtime"/>
+        <conf name="deploytime"/>
+	</configurations>
+	<dependencies>
+		<dependency org="yuicompressor" name="yuicompressor" rev="2.4.1" conf="runtime"/>
+	</dependencies>
+</ivy-module>

@@ -1,0 +1,129 @@
+<project name="Commons YUI Compressor" default="dist" basedir="."
+			xmlns:ivy="antlib:org.apache.ivy.ant">
+    <property file="build.properties"/>
+    <property name="ivy.version" value="2.0.0"/>
+    <property name="project.name" value="yuicompressor-anttask"/>
+    <property name="project.version" value="dev"/>
+
+	<!-- Directory where 3rd party libs are stored -->
+	<property name="lib.dir" value="lib"/>
+	<property name="lib.runtime.dir" value="${lib.dir}/runtime"/>
+    
+    <!-- ==== Path Definitions ==== -->
+    <path id="compile.classpath">
+        <fileset dir="${lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="test.classpath">
+        <fileset dir="${lib.runtime.dir}">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${dist.dir}">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+    
+    <!-- ===================================================================
+          Resolve Artifacts.
+         =================================================================== -->
+    <target name="resolve" depends="install-ivy" unless="resolve.no">
+        <ivy:retrieve pattern="${lib.runtime.dir}/[artifact]-[revision].[ext]"/>
+    </target>
+         
+    <!-- ===================================================================
+          Build distribution artifacts.
+         =================================================================== -->
+    <target name="dist" depends="compile">
+        <mkdir dir="${dist.dir}"/>		
+        <jar destfile="${dist.dir}/${project.name}-${project.version}.jar">
+            <fileset dir="${build.dir}">
+                <include name="**/*"/>
+            </fileset>
+        </jar>
+    </target>
+
+    <!-- ===================================================================
+          Compile code.
+         =================================================================== -->
+    <target name="compile" depends="resolve">
+        <mkdir 	dir="${build.dir}"/>
+            <javac destdir="${build.dir}"
+                   debug="${compile.debug}"
+                   deprecation="${compile.deprecation}"
+                   optimize="${compile.optimize}"
+                   source="${source.level}"
+                   target="${target.level}">
+                <classpath refid="compile.classpath"/>
+                <src path="${src.dir}"/>
+            </javac>
+    </target>
+
+    <!-- ===================================================================
+          Build clean
+         =================================================================== -->
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+        <delete dir="${docs.api.dir}"/>
+        <delete dir="${test.output.dir}"/>
+    </target>
+
+    <!-- ===================================================================
+          Build javadoc
+         =================================================================== -->
+    <target name="javadoc">
+        <mkdir dir="${docs.api.dir}"/>
+        <javadoc packagenames="*"
+                 classpathref="compile.classpath"
+                 sourcepath="${src.dir}"
+                 destdir="${docs.api.dir}"
+                 author="true"
+                 version="false"
+                 use="true"
+                 windowtitle="YUI Js/Css Compressor Ant Task">
+        </javadoc>
+    </target>
+
+    <!-- ===================================================================
+          Run tests.
+         =================================================================== -->
+    <target name="test" depends="dist">
+        <taskdef name="yuicompressor"
+                 classname="com.iwouldrather.yuicompressor.anttask.YuiCompressorTask"
+                 classpathref="test.classpath"/>
+        <yuicompressor todir="${test.output.dir}">
+            <fileset dir="samples">
+                <include name="**/*.css"/>
+                <include name="**/*.js"/>
+            </fileset>
+        </yuicompressor>
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- =================================================================== -->
+    <!-- PRIVATE TARGETS, SHOULD NOT NEED TO USE THESE DIRECTLY              -->
+    <!-- =================================================================== -->
+    <!-- =================================================================== -->
+
+    <!-- =================================================================== -->
+    <target name="download-ivy" unless="ivy.available">
+        <mkdir dir="${lib.dir}"/>
+        <mkdir dir="${lib.dir}/ivy"/>
+        <echo message="installing ivy..."/>
+        <get src="http://ivy.iwouldrather.com/ivy/ivy/${ivy.version}/ivy-${ivy.version}.jar" dest="${lib.dir}/ivy/ivy-${ivy.version}.jar" usetimestamp="true"/>
+    </target>
+
+    <!-- =================================================================== -->
+    <target name="install-ivy" unless="ivy.installed">
+        <available file="${lib.dir}/ivy/ivy-${ivy.version}.jar" property="ivy.available"/>
+        <antcall target="download-ivy"/>
+        <path id="ivy.lib.path">
+            <fileset dir="${lib.dir}/ivy" includes="*.jar"/>
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+        <property name="ivy.installed" value="true"/>
+    </target>
+
+</project>
