@@ -2,17 +2,19 @@
 			xmlns:ivy="antlib:org.apache.ivy.ant">
     <property file="build.properties"/>
     <property name="ivy.version" value="2.0.0"/>
+    <property name="ant.vers" value="1.8.1"/>
     <property name="project.name" value="yuicompressor-anttask"/>
-    <property name="project.version" value="dev"/>
+    <property name="project.version" value="1.1"/>
 
 	<!-- Directory where 3rd party libs are stored -->
 	<property name="lib.dir" value="lib"/>
 	<property name="lib.runtime.dir" value="${lib.dir}/runtime"/>
+        <property name="lib.buildtime.dir" value="${lib.dir}/buildtime"/>
     
     <!-- ==== Path Definitions ==== -->
     <path id="compile.classpath">
         <fileset dir="${lib.dir}">
-            <include name="*.jar"/>
+            <include name="*/*.jar"/>
         </fileset>
     </path>
 
@@ -28,7 +30,7 @@
     <!-- ===================================================================
           Resolve Artifacts.
          =================================================================== -->
-    <target name="resolve" depends="install-ivy" unless="resolve.no">
+    <target name="resolve" depends="install-ivy,install-ant" unless="resolve.no">
         <ivy:retrieve pattern="${lib.runtime.dir}/[artifact]-[revision].[ext]"/>
     </target>
          
@@ -91,7 +93,7 @@
          =================================================================== -->
     <target name="test" depends="dist">
         <taskdef name="yuicompressor"
-                 classname="com.iwouldrather.yuicompressor.anttask.YuiCompressorTask"
+                 classname="com.metrosix.yuicompressor.anttask.YuiCompressorTask"
                  classpathref="test.classpath"/>
         <yuicompressor todir="${test.output.dir}">
             <fileset dir="samples">
@@ -112,7 +114,7 @@
         <mkdir dir="${lib.dir}"/>
         <mkdir dir="${lib.dir}/ivy"/>
         <echo message="installing ivy..."/>
-        <get src="http://ivy.iwouldrather.com/ivy/ivy/${ivy.version}/ivy-${ivy.version}.jar" dest="${lib.dir}/ivy/ivy-${ivy.version}.jar" usetimestamp="true"/>
+        <get src="http://ivy.metro-six.com/ivy/ivy/${ivy.version}/ivy-${ivy.version}.jar" dest="${lib.dir}/ivy/ivy-${ivy.version}.jar" usetimestamp="true"/>
     </target>
 
     <!-- =================================================================== -->
@@ -124,6 +126,24 @@
         </path>
         <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
         <property name="ivy.installed" value="true"/>
+    </target>
+
+    <!-- =================================================================== -->
+    <target name="download-ant" unless="ant.available">
+        <mkdir dir="${lib.dir}"/>
+        <mkdir dir="${lib.dir}/ant"/>
+        <echo message="installing ant..."/>
+        <get src="http://ivy.metro-six.com/ant/ant/${ant.vers}/ant-${ant.vers}.jar" dest="${lib.dir}/ant/ant-${ant.vers}.jar" usetimestamp="true"/>
+    </target>
+
+    <!-- =================================================================== -->
+    <target name="install-ant" unless="ant.installed">
+        <available file="${lib.dir}/ant/ant-${ant.vers}.jar" property="ant.available"/>
+        <antcall target="download-ant"/>
+        <path id="ant.lib.path">
+            <fileset dir="${lib.dir}/ant" includes="*.jar"/>
+        </path>
+        <property name="ant.installed" value="true"/>
     </target>
 
 </project>
