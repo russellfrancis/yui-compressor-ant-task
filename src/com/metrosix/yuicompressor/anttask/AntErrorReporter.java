@@ -5,7 +5,7 @@
  * Code licensed under the BSD License:
  *     http://developer.yahoo.net/yui/license.txt
  */
-package com.iwouldrather.yuicompressor.anttask;
+package com.metrosix.yuicompressor.anttask;
 
 import org.apache.tools.ant.Project;
 import org.mozilla.javascript.ErrorReporter;

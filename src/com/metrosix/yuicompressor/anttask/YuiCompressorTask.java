@@ -5,7 +5,7 @@
  * Code licensed under the BSD License:
  *     http://developer.yahoo.net/yui/license.txt
  */
-package com.iwouldrather.yuicompressor.anttask;
+package com.metrosix.yuicompressor.anttask;
 
 import com.yahoo.platform.yui.compressor.CssCompressor;
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
