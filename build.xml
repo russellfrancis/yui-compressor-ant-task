@@ -6,9 +6,9 @@
     <property name="project.name" value="yuicompressor-anttask"/>
     <property name="project.version" value="1.1"/>
 
-	<!-- Directory where 3rd party libs are stored -->
-	<property name="lib.dir" value="lib"/>
-	<property name="lib.runtime.dir" value="${lib.dir}/runtime"/>
+    <!-- Directory where 3rd party libs are stored -->
+    <property name="lib.dir" value="lib"/>
+    <property name="lib.runtime.dir" value="${lib.dir}/runtime"/>
     <property name="lib.ant.dir" value="${lib.dir}/ant"/>
     <property name="lib.buildtime.dir" value="${lib.dir}/buildtime"/>
     
@@ -137,7 +137,7 @@
         <mkdir dir="${lib.dir}"/>
         <mkdir dir="${lib.dir}/ant"/>
         <echo message="installing ant..."/>
-        <get src="http://ivy.metro-six.com/ant/ant/${ant.vers}/ant-${ant.vers}.jar" dest="${lib.dir}/ant/ant-${ant.vers}.jar" usetimestamp="true"/>
+        <get src="http://ivy.metro-six.com/ant/ant/${ant.vers}/ant.jar" dest="${lib.dir}/ant/ant-${ant.vers}.jar" usetimestamp="true"/>
     </target>
 
     <!-- =================================================================== -->
