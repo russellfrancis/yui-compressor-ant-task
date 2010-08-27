@@ -9,12 +9,16 @@
 	<!-- Directory where 3rd party libs are stored -->
 	<property name="lib.dir" value="lib"/>
 	<property name="lib.runtime.dir" value="${lib.dir}/runtime"/>
-        <property name="lib.buildtime.dir" value="${lib.dir}/buildtime"/>
+    <property name="lib.ant.dir" value="${lib.dir}/ant"/>
+    <property name="lib.buildtime.dir" value="${lib.dir}/buildtime"/>
     
     <!-- ==== Path Definitions ==== -->
     <path id="compile.classpath">
-        <fileset dir="${lib.dir}">
-            <include name="*/*.jar"/>
+        <fileset dir="${lib.runtime.dir}">
+            <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${lib.ant.dir}">
+            <include name="*.jar"/>
         </fileset>
     </path>
 
