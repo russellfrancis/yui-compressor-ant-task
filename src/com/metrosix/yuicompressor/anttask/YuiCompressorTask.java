@@ -25,7 +25,7 @@ import org.apache.tools.ant.types.FileSet;
  * This class implements an ant task which can be used to process sets of
  * javascript and css files to make them smaller.  It will remove unneeded spaces,
  * and can also obfuscate variable names which result in smaller code.  This
- * allows us to shring the size of downloaded css and js files from our applications
+ * allows us to shrink the size of downloaded css and js files from our applications
  * web-server.
  * 
  * @author Russell Francis (russell.francis@gmail.com)
