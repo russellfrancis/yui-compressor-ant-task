@@ -4,6 +4,7 @@
     <property name="ant.vers" value="1.8.1"/>
     <property name="project.name" value="yui-compressor-ant-task"/>
     <property name="project.version" value="dev"/>
+    <property name="project.major.version" value="1.2"/>
     <property name="ivy.settings.dir" value="settings"/>
     <property name="ivy.settings.file" value="ivysettings.xml"/>
 
@@ -56,7 +57,7 @@
     </target>
 
     <target name="generate-version" depends="install-ivy" if="release.build">
-        <ivy:buildnumber organisation="m6" module="${project.name}" revision="${project.version}."/>
+        <ivy:buildnumber organisation="m6" module="${project.name}" revision="${project.major.version}."/>
     </target>
          
     <!-- ===================================================================
