@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ivy-module version="2.0">
+<ivy-module version="2.0"> 
 	<info organisation="m6" module="yui-compressor-ant-task"/>
 	<configurations defaultconfmapping="runtime->*">
         <conf name="runtime" visibility="public"/>
