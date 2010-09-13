@@ -1,13 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
-	<!-- Author: Russell Francis  -->
-	<info organisation="yuicompressor" module="yuicompressor-anttask"/>
-	<configurations defaultconfmapping="buildtime->*;runtime->*;testtime->*;deploytime->*;">
-        <conf name="runtime"/>
-        <conf name="buildtime"/>
-        <conf name="testtime"/>
-        <conf name="deploytime"/>
+	<info organisation="m6" module="yui-compressor-ant-task"/>
+	<configurations defaultconfmapping="runtime->*">
+        <conf name="runtime" visibility="public"/>
 	</configurations>
 	<dependencies>
-		<dependency org="yuicompressor" name="yuicompressor" rev="2.4.1" conf="runtime"/>
+		<dependency org="yuicompressor" name="yuicompressor" rev="2.+" conf="runtime"/>
 	</dependencies>
 </ivy-module>
