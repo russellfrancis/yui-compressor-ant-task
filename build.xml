@@ -1,10 +1,11 @@
-<project name="Commons YUI Compressor" default="dist" basedir="."
-			xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="yui-compressor-ant-task" default="publish" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
     <property file="build.properties"/>
-    <property name="ivy.version" value="2.0.0"/>
+    <property name="ivy.version" value="2.2.0-rc1"/>
     <property name="ant.vers" value="1.8.1"/>
-    <property name="project.name" value="yuicompressor-anttask"/>
-    <property name="project.version" value="1.1"/>
+    <property name="project.name" value="yui-compressor-ant-task"/>
+    <property name="project.version" value="dev"/>
+    <property name="ivy.settings.dir" value="settings"/>
+    <property name="ivy.settings.file" value="ivysettings.xml"/>
 
     <!-- Directory where 3rd party libs are stored -->
     <property name="lib.dir" value="lib"/>
@@ -34,16 +35,37 @@
     <!-- ===================================================================
           Resolve Artifacts.
          =================================================================== -->
-    <target name="resolve" depends="install-ivy,install-ant" unless="resolve.no">
-        <ivy:retrieve pattern="${lib.runtime.dir}/[artifact]-[revision].[ext]"/>
+    <target name="resolve" depends="resolve-runtime,install-ant" unless="resolve.no"/>
+
+    <target name="resolve-runtime" depends="ivy-settings" unless="resolve.no">
+        <fail unless="lib.runtime.dir"/>
+        <ivy:retrieve pattern="${lib.runtime.dir}/[artifact]-[revision].[ext]" conf="runtime"/>
+    </target>
+
+    <target name="ivy-settings" depends="install-ivy" unless="resolve.no">
+        <fail unless="ivy.settings.dir"/>
+        <ivy:settings file="${ivy.settings.dir}/${ivy.settings.file}"/>
+    </target>
+
+    <target name="publish" depends="resolve,dist" unless="no.publish">
+        <fail unless="dist.dir"/>
+        
+        <ivy:publish pubrevision="${ivy.new.revision}" overwrite="true" resolver="local">
+            <artifacts pattern="${dist.dir}/[artifact]-[revision].[ext]"/>
+        </ivy:publish>
+    </target>
+
+    <target name="generate-version" depends="install-ivy" if="release.build">
+        <ivy:buildnumber organisation="m6" module="${project.name}" revision="${project.version}."/>
     </target>
          
     <!-- ===================================================================
           Build distribution artifacts.
          =================================================================== -->
-    <target name="dist" depends="compile">
-        <mkdir dir="${dist.dir}"/>		
-        <jar destfile="${dist.dir}/${project.name}-${project.version}.jar">
+    <target name="dist" depends="compile,generate-version">
+        <mkdir dir="${dist.dir}"/>
+        <property name="ivy.new.revision" value="${project.version}"/>
+        <jar destfile="${dist.dir}/${project.name}-${ivy.new.revision}.jar">
             <fileset dir="${build.dir}">
                 <include name="**/*"/>
             </fileset>
@@ -74,6 +96,10 @@
         <delete dir="${dist.dir}"/>
         <delete dir="${docs.api.dir}"/>
         <delete dir="${test.output.dir}"/>
+        <delete dir="${lib.dir}">
+            <exclude name="ant/**/*"/>
+            <exclude name="ivy/**/*"/>
+        </delete>
     </target>
 
     <!-- ===================================================================
