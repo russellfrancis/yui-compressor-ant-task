@@ -1,6 +1,6 @@
 /*
  * YUI Compressor
- * Author: Russell Francis (russell.francis@gmail.com)
+ * Author: Russell Francis (russ@metro-six.com)
  * Copyright (c) 2007, Yahoo! Inc. All rights reserved.
  * Code licensed under the BSD License:
  *     http://developer.yahoo.net/yui/license.txt
@@ -14,20 +14,11 @@ import org.mozilla.javascript.EvaluatorException;
 /**
  * A basic error reporter implementation for reporting errors to an ant project.
  * 
- * @author Russell Francis (russell.francis@gmail.com)
- * @version $Id$
+ * @author Russell Francis (russ@metro-six.com)
  */
 public class AntErrorReporter implements ErrorReporter {    
-    //==========================================================================
-    //  CLASS
-    //==========================================================================
-    
-    //==========================================================================
-    //  INSTANCE
-    //==========================================================================    
     private Project project = null;
     
-    //--------------------------------------------------------------------------
     /**
      * Construct a new AntErrorReporter instance.
      * @param project The ant project which we should report errors to.
@@ -39,7 +30,6 @@ public class AntErrorReporter implements ErrorReporter {
         this.project = project;
     }
     
-    //--------------------------------------------------------------------------
     public void warning(String message, String sourceName, int line, String lineSource, int lineOffset) {
         if (line < 0) {
             this.project.log("[WARNING] " + message);
@@ -48,7 +38,6 @@ public class AntErrorReporter implements ErrorReporter {
         }
     }
 
-    //--------------------------------------------------------------------------
     public void error(String message, String sourceName, int line, String lineSource, int lineOffset) {
         if (line < 0) {
             this.project.log("[ERROR] " + message);
@@ -57,7 +46,6 @@ public class AntErrorReporter implements ErrorReporter {
         }
     }
     
-    //--------------------------------------------------------------------------
     public EvaluatorException runtimeError(String message, String sourceName, int line, String lineSource, int lineOffset) {
         error(message, sourceName, line, lineSource, lineOffset);
         return new EvaluatorException(message);

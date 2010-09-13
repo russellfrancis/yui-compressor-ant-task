@@ -1,6 +1,6 @@
 /*
  * YUI Compressor
- * Author: Russell Francis (russell.francis@gmail.com)
+ * Author: Russell Francis (russ@metro-six.com)
  * Copyright (c) 2007, Yahoo! Inc. All rights reserved.
  * Code licensed under the BSD License:
  *     http://developer.yahoo.net/yui/license.txt
@@ -28,19 +28,10 @@ import org.apache.tools.ant.types.FileSet;
  * allows us to shrink the size of downloaded css and js files from our applications
  * web-server.
  * 
- * @author Russell Francis (russell.francis@gmail.com)
- * @version $Id$
+ * @author Russell Francis (russ@metro-six.com)
  */
 public class YuiCompressorTask extends Task {
     
-    //==========================================================================
-    //  CLASS
-    //==========================================================================
-    
-    //==========================================================================
-    //  INSTANCE
-    //==========================================================================        
-
     // Javascript options.
     private boolean munge = true;
     private boolean warn = false;
@@ -52,7 +43,6 @@ public class YuiCompressorTask extends Task {
     private List fileSets = new ArrayList();
     private String type = null;    
  
-    //--------------------------------------------------------------------------
     /**
      * Construct a new YuiCompressorTask to process files using the YUI javascript
      * and css compression tool.
@@ -61,7 +51,6 @@ public class YuiCompressorTask extends Task {
         super();
     }
     
-    //--------------------------------------------------------------------------
     /**
      * Add a fileset which should be processed by this task.
      * @param fileSet The FileSet object which we should process.
@@ -73,7 +62,6 @@ public class YuiCompressorTask extends Task {
         this.fileSets.add(fileSet);
     }
     
-    //--------------------------------------------------------------------------
     /**
      * The destination directory we should use when copying
      * @param destDir  The destination directory we should use when copying a 
@@ -83,7 +71,6 @@ public class YuiCompressorTask extends Task {
         this.destDir = destDir;
     }
     
-    //--------------------------------------------------------------------------
     /**
      * Set the type of compression to apply to the files within the fileset, we
      * can either compress "js" or "css" files.  We usually don't need to set this
@@ -102,7 +89,6 @@ public class YuiCompressorTask extends Task {
         this.type = type;
     }
     
-    //--------------------------------------------------------------------------
     /**
      * If this is enabled, we will change variable names to shorter values and 
      * otherwise obfuscate the code.  Otherwise, we will just minimize the source
@@ -114,7 +100,6 @@ public class YuiCompressorTask extends Task {
         this.munge = munge;
     }
     
-    //--------------------------------------------------------------------------
     /**
      * Whether or not we should warn about bad javascript practices and other
      * style things that we don't like.  The default is false.
@@ -124,7 +109,6 @@ public class YuiCompressorTask extends Task {
         this.warn = warn;
     }
     
-    //--------------------------------------------------------------------------
     /**
      * Whether we should preserve all semicolons, even those which are not needed.
      * The default is false.
@@ -135,7 +119,6 @@ public class YuiCompressorTask extends Task {
         this.preserveAllSemiColons = preserveAllSemiColons;
     }
 
-    //--------------------------------------------------------------------------
     /**
      * Whether or not to merge concatenated string literals.  The default is false.
      * @param preserveStringLiterals If true, we will not modify string literals,
@@ -146,7 +129,6 @@ public class YuiCompressorTask extends Task {
         this.preserveStringLiterals = preserveStringLiterals;
     }
 
-    //--------------------------------------------------------------------------
     /**
      * The compressor will squish many lines of code onto a single line.  If you
      * wish to not have lines longer than a certain length, you may set that here.
@@ -160,7 +142,6 @@ public class YuiCompressorTask extends Task {
         }
     }
    
-    //--------------------------------------------------------------------------
     /**
      * Perform the compression of the files from the fileset.
      */
@@ -187,7 +168,6 @@ public class YuiCompressorTask extends Task {
         }
     }
 
-    //--------------------------------------------------------------------------
     /**
      * Given a srcFile and destFile, perform the necessary compression either
      * css or js saving the compressed srcFile to destFile.
@@ -219,7 +199,6 @@ public class YuiCompressorTask extends Task {
         }        
     }
     
-    //--------------------------------------------------------------------------
     /**
      * Compress the given source file as if it was a .css file.
      * @param srcFile The source css file we wish to compress.
@@ -240,7 +219,6 @@ public class YuiCompressorTask extends Task {
         }
     }
     
-    //--------------------------------------------------------------------------
     /**
      * Compress the given source file as though it was a javascript file.
      * @param srcFile The source file to compress as a javascript file.
