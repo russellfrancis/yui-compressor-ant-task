@@ -180,7 +180,10 @@ public class YuiCompressorTask extends Task {
         // handle individual files.
         if (srcFile != null && srcFile.exists() && destFile != null) {
             // ensure destFile exists.
-            destFile.getParentFile().mkdirs();
+            if (!destFile.getParentFile().mkdirs()) {
+                throw new IOException("Unable to create destination location '" + 
+                        destFile.getParentFile().getAbsolutePath() + "'.");
+            }
             if( (type != null && type.compareTo("css") == 0)    ||
                 (type == null && srcFile.getName().endsWith("css") ) )
             {
