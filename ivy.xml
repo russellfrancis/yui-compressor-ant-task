@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0"> 
 	<info organisation="m6" module="yui-compressor-ant-task"/>
-	<configurations defaultconfmapping="runtime->*">
+	<configurations defaultconfmapping="runtime->*;testtime->*;">
+        <conf name="testtime" extends="runtime" visibility="private"/>
         <conf name="runtime" visibility="public"/>
 	</configurations>
 	<dependencies>
 		<dependency org="yuicompressor" name="yuicompressor" rev="2.+" conf="runtime"/>
+
+        <dependency org="junit" name="junit" rev="4.+" conf="testtime"/>
+        <dependency org="easymock" name="easymock" rev="3.+" conf="testtime"/>
+        <dependency org="findbugs" name="findbugs" rev="1.+" conf="testtime"/>
+        <dependency org="cobertura" name="cobertura" rev="1.9.+" conf="testtime"/>
 	</dependencies>
 </ivy-module>
