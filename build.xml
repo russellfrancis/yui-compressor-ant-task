@@ -1,4 +1,5 @@
 <project name="yui-compressor-ant-task" default="publish" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+
     <property file="build.properties"/>
     <property name="ivy.version" value="2.2.0-rc1"/>
     <property name="ant.vers" value="1.8.1"/>
@@ -8,13 +9,23 @@
     <property name="ivy.settings.dir" value="settings"/>
     <property name="ivy.settings.file" value="ivysettings.xml"/>
 
-    <!-- Directory where 3rd party libs are stored -->
+    <property name="build.dir" value="build"/>
+    <property name="src.dir" value="src"/>
     <property name="lib.dir" value="lib"/>
+    <property name="dist.dir" value="dist"/>
+    <property name="docs.dir" value="docs"/>
+    <property name="docs.api.dir" value="${docs.dir}/api"/>
+    <property name="test.output.dir" value="test-output"/>
+    <property name="compile.debug" value="true"/>
+    <property name="compile.deprecation" value="true"/>
+    <property name="compile.optimize" value="true"/>
+    <property name="source.level" value="1.5"/>
+    <property name="target.level" value="1.5"/>
+
     <property name="lib.runtime.dir" value="${lib.dir}/runtime"/>
     <property name="lib.ant.dir" value="${lib.dir}/ant"/>
-    <property name="lib.buildtime.dir" value="${lib.dir}/buildtime"/>
+    <property name="lib.testtime.dir" value="${lib.dir}/testtime"/>
     
-    <!-- ==== Path Definitions ==== -->
     <path id="compile.classpath">
         <fileset dir="${lib.runtime.dir}">
             <include name="*.jar"/>
@@ -33,21 +44,28 @@
         </fileset>
     </path>
     
-    <!-- ===================================================================
-          Resolve Artifacts.
-         =================================================================== -->
-    <target name="resolve" depends="resolve-runtime,install-ant" unless="resolve.no"/>
+    <!-- =========================================================================================================== -->
+    <target name="resolve" depends="resolve-runtime,resolve-testtime,install-ant" unless="resolve.no"/>
 
+    <!-- =========================================================================================================== -->
     <target name="resolve-runtime" depends="ivy-settings" unless="resolve.no">
         <fail unless="lib.runtime.dir"/>
         <ivy:retrieve pattern="${lib.runtime.dir}/[artifact]-[revision].[ext]" conf="runtime"/>
     </target>
 
+    <!-- =========================================================================================================== -->
+    <target name="resolve-testtime" depends="ivy-settings" unless="resolve.no">
+        <fail unless="lib.testtime.dir"/>
+        <ivy:retrieve pattern="${lib.testtime.dir}/[artifact]-[revision].[ext]" conf="testtime"/>
+    </target>
+
+    <!-- =========================================================================================================== -->
     <target name="ivy-settings" depends="install-ivy" unless="resolve.no">
         <fail unless="ivy.settings.dir"/>
         <ivy:settings file="${ivy.settings.dir}/${ivy.settings.file}"/>
     </target>
 
+    <!-- =========================================================================================================== -->
     <target name="publish" depends="resolve,dist" unless="no.publish">
         <fail unless="dist.dir"/>
         
@@ -56,61 +74,57 @@
         </ivy:publish>
     </target>
 
+    <!-- =========================================================================================================== -->
     <target name="generate-version" depends="install-ivy" if="release.build">
         <ivy:buildnumber organisation="m6" module="${project.name}" revision="${project.major.version}."/>
     </target>
          
-    <!-- ===================================================================
-          Build distribution artifacts.
-         =================================================================== -->
+    <!-- =========================================================================================================== -->
     <target name="dist" depends="compile,generate-version">
         <mkdir dir="${dist.dir}"/>
         <property name="ivy.new.revision" value="${project.version}"/>
         <jar destfile="${dist.dir}/${project.name}-${ivy.new.revision}.jar">
-            <fileset dir="${build.dir}">
+            <fileset dir="${build.dir}/main">
                 <include name="**/*"/>
             </fileset>
         </jar>
     </target>
 
-    <!-- ===================================================================
-          Compile code.
-         =================================================================== -->
+    <!-- =========================================================================================================== -->
     <target name="compile" depends="resolve">
-        <mkdir 	dir="${build.dir}"/>
-            <javac destdir="${build.dir}"
-                   debug="${compile.debug}"
-                   deprecation="${compile.deprecation}"
-                   optimize="${compile.optimize}"
-                   source="${source.level}"
-                   target="${target.level}">
-                <classpath refid="compile.classpath"/>
-                <src path="${src.dir}"/>
-            </javac>
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${build.dir}/main"/>
+        <javac destdir="${build.dir}/main"
+               debug="${compile.debug}"
+               deprecation="${compile.deprecation}"
+               optimize="${compile.optimize}"
+               source="${source.level}"
+               target="${target.level}">
+            <classpath refid="compile.classpath"/>
+            <src path="${src.dir}/main/java"/>
+        </javac>
     </target>
 
-    <!-- ===================================================================
-          Build clean
-         =================================================================== -->
+    <!-- =========================================================================================================== -->
     <target name="clean">
-        <delete dir="${build.dir}"/>
-        <delete dir="${dist.dir}"/>
-        <delete dir="${docs.api.dir}"/>
-        <delete dir="${test.output.dir}"/>
-        <delete dir="${lib.dir}">
-            <exclude name="ant/**/*"/>
-            <exclude name="ivy/**/*"/>
-        </delete>
+        <parallel>
+            <delete dir="${build.dir}"/>
+            <delete dir="${dist.dir}"/>
+            <delete dir="${docs.api.dir}"/>
+            <delete dir="${test.output.dir}"/>
+            <delete dir="${lib.dir}">
+                <exclude name="ant/**/*"/>
+                <exclude name="ivy/**/*"/>
+            </delete>
+        </parallel>
     </target>
 
-    <!-- ===================================================================
-          Build javadoc
-         =================================================================== -->
+    <!-- =========================================================================================================== -->
     <target name="javadoc">
         <mkdir dir="${docs.api.dir}"/>
         <javadoc packagenames="*"
                  classpathref="compile.classpath"
-                 sourcepath="${src.dir}"
+                 sourcepath="${src.dir}/main/java"
                  destdir="${docs.api.dir}"
                  author="true"
                  version="false"
@@ -119,10 +133,8 @@
         </javadoc>
     </target>
 
-    <!-- ===================================================================
-          Run tests.
-         =================================================================== -->
-    <target name="test" depends="dist">
+    <!-- =========================================================================================================== -->
+    <target name="test" depends="dist,test-findbugs">
         <taskdef name="yuicompressor"
                  classname="com.metrosix.yuicompressor.anttask.YuiCompressorTask"
                  classpathref="test.classpath"/>
@@ -134,13 +146,44 @@
         </yuicompressor>
     </target>
 
-    <!-- =================================================================== -->
-    <!-- =================================================================== -->
-    <!-- PRIVATE TARGETS, SHOULD NOT NEED TO USE THESE DIRECTLY              -->
-    <!-- =================================================================== -->
-    <!-- =================================================================== -->
+    <!-- =========================================================================================================== -->
+    <target name="test-findbugs" depends="dist,install-findbugs">
+        <mkdir dir="${dist.dir}"/>
+        <mkdir dir="${dist.dir}/reports"/>
+        <mkdir dir="${dist.dir}/reports/main"/>
+        <mkdir dir="${dist.dir}/reports/main/findbugs-xml"/>
+        <mkdir dir="${dist.dir}/reports/main/findbugs-html"/>
+        <findbugs   home="${build.dir}/findbugs"
+                    output="xml"
+                    outputFile="${dist.dir}/reports/main/findbugs-xml/findbugs.xml"
+                    effort="max"
+                    jvmargs="-Xmx256m">
+            <auxClasspath>
+                <path refid="compile.classpath"/>
+            </auxClasspath>
+            <sourcePath path="${src.dir}/main/java"/>
+            <class location="${build.dir}/main"/>
+        </findbugs>
+        <findbugs   home="${build.dir}/findbugs"
+                    output="html"
+                    outputFile="${dist.dir}/reports/main/findbugs-html/findbugs.html"
+                    effort="max"
+                    jvmargs="-Xmx256m">
+            <auxClasspath>
+                <path refid="compile.classpath"/>
+            </auxClasspath>
+            <sourcePath path="${src.dir}/main/java"/>
+            <class location="${build.dir}/main"/>
+        </findbugs>
+    </target>
 
-    <!-- =================================================================== -->
+    <!-- =========================================================================================================== -->
+    <!-- =========================================================================================================== -->
+    <!-- PRIVATE TARGETS, SHOULD NOT NEED TO USE THESE DIRECTLY                                                      -->
+    <!-- =========================================================================================================== -->
+    <!-- =========================================================================================================== -->
+
+    <!-- =========================================================================================================== -->
     <target name="download-ivy" unless="ivy.available">
         <mkdir dir="${lib.dir}"/>
         <mkdir dir="${lib.dir}/ivy"/>
@@ -148,7 +191,7 @@
         <get src="http://ivy.metro-six.com/ivy/ivy/${ivy.version}/ivy-${ivy.version}.jar" dest="${lib.dir}/ivy/ivy-${ivy.version}.jar" usetimestamp="true"/>
     </target>
 
-    <!-- =================================================================== -->
+    <!-- =========================================================================================================== -->
     <target name="install-ivy" unless="ivy.installed">
         <available file="${lib.dir}/ivy/ivy-${ivy.version}.jar" property="ivy.available"/>
         <antcall target="download-ivy"/>
@@ -159,7 +202,7 @@
         <property name="ivy.installed" value="true"/>
     </target>
 
-    <!-- =================================================================== -->
+    <!-- =========================================================================================================== -->
     <target name="download-ant" unless="ant.available">
         <mkdir dir="${lib.dir}"/>
         <mkdir dir="${lib.dir}/ant"/>
@@ -167,7 +210,7 @@
         <get src="http://ivy.metro-six.com/ant/ant/${ant.vers}/ant.jar" dest="${lib.dir}/ant/ant-${ant.vers}.jar" usetimestamp="true"/>
     </target>
 
-    <!-- =================================================================== -->
+    <!-- =========================================================================================================== -->
     <target name="install-ant" unless="ant.installed">
         <available file="${lib.dir}/ant/ant-${ant.vers}.jar" property="ant.available"/>
         <antcall target="download-ant"/>
@@ -175,6 +218,36 @@
             <fileset dir="${lib.dir}/ant" includes="*.jar"/>
         </path>
         <property name="ant.installed" value="true"/>
+    </target>
+
+    <!-- =========================================================================================================== -->
+    <target name="install-findbugs" depends="resolve" unless="findbugs.installed">
+        <fail unless="lib.dir"/>
+        <fail unless="build.dir"/>
+
+        <!-- unzips findbugs into the test directory. -->
+        <unzip dest="${build.dir}/findbugs">
+            <fileset dir="${lib.dir}/testtime">
+                <include name="findbugs-*.zip"/>
+            </fileset>
+            <!-- This strips out the findbugs-version directory which
+                 is contained within the zip archive. -->
+            <mapper type="regexp" from="^findbugs-[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9])?/(.*)$$" to="\2"/>
+        </unzip>
+        <!-- This works around an ironic bug in findbugs ... -->
+        <mkdir dir="${build.dir}/findbugs/plugin"/>
+
+        <!-- Now define the findbugs task. -->
+        <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask">
+            <classpath>
+                <path>
+                    <fileset dir="${build.dir}/findbugs/lib">
+                        <include name="*.jar"/>
+                    </fileset>
+                </path>
+            </classpath>
+        </taskdef>
+        <property name="findbugs.installed" value="true"/>
     </target>
 
 </project>
