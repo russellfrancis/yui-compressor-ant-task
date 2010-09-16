@@ -211,14 +211,17 @@ public class YuiCompressorTask extends Task {
      */
     private void compressCss( File srcFile, File destFile ) throws IOException {
         Reader reader = new FileReader( srcFile );
-        Writer writer = new FileWriter( destFile );
-        CssCompressor cssCompressor = new CssCompressor( reader );
         try {
-            cssCompressor.compress(writer, maxColumnWidth);
-        } finally {
-            if (writer != null) {
+            Writer writer = new FileWriter( destFile );
+            try {
+                CssCompressor cssCompressor = new CssCompressor( reader );
+                cssCompressor.compress(writer, maxColumnWidth);
+            } finally {
                 writer.close();
             }
+        }
+        finally {
+            reader.close();
         }
     }
     
@@ -231,14 +234,17 @@ public class YuiCompressorTask extends Task {
      */
     private void compressJs(File srcFile, File destFile) throws IOException {
         Reader reader = new FileReader( srcFile );
-        Writer writer = new FileWriter( destFile );
-        JavaScriptCompressor compressor = new JavaScriptCompressor(reader, new AntErrorReporter( this.getProject() ) );
         try {
-            compressor.compress( writer, maxColumnWidth, munge, warn, preserveAllSemiColons, preserveStringLiterals );
-        } finally {
-            if (writer != null) {
+            Writer writer = new FileWriter( destFile );
+            try {
+                JavaScriptCompressor compressor = new JavaScriptCompressor(reader, new AntErrorReporter( this.getProject() ) );
+                compressor.compress( writer, maxColumnWidth, munge, warn, preserveAllSemiColons, preserveStringLiterals );
+            } finally {
                 writer.close();
             }
+        }
+        finally {
+            reader.close();
         }
     }
 } 
