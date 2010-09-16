@@ -120,7 +120,7 @@
     </target>
 
     <!-- =========================================================================================================== -->
-    <target name="javadoc">
+    <target name="javadoc" depends="resolve">
         <mkdir dir="${docs.api.dir}"/>
         <javadoc packagenames="*"
                  classpathref="compile.classpath"
