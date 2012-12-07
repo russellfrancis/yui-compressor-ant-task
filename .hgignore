@@ -4,3 +4,5 @@ dist
 test-output
 lib
 docs/api
+.idea
+\.iml$
