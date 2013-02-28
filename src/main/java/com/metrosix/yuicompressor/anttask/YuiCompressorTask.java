@@ -9,17 +9,13 @@ package com.metrosix.yuicompressor.anttask;
 
 import com.yahoo.platform.yui.compressor.CssCompressor;
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class implements an ant task which can be used to process sets of
@@ -36,7 +32,8 @@ public class YuiCompressorTask extends Task {
     private boolean munge = true;
     private boolean warn = false;
     private boolean preserveAllSemiColons = false;
-    private boolean preserveStringLiterals = false;    
+    private boolean preserveStringLiterals = false;
+    private String charset = null;
     
     private int maxColumnWidth = -1;
     private File destDir = null;
@@ -87,6 +84,15 @@ public class YuiCompressorTask extends Task {
             throw new IllegalArgumentException( "The parameter type must be either \"js\" or \"css\"." );
         }
         this.type = type;
+    }
+
+    /**
+     * Set the character set encoding to use when reading input files.
+     *
+     * @param charset The character set to use when reading the input source files.
+     */
+    public void setCharset(String charset) {
+        this.charset = charset;
     }
     
     /**
@@ -210,9 +216,9 @@ public class YuiCompressorTask extends Task {
      * the files.
      */
     private void compressCss( File srcFile, File destFile ) throws IOException {
-        Reader reader = new FileReader( srcFile );
+        Reader reader = getReader( srcFile );
         try {
-            Writer writer = new FileWriter( destFile );
+            Writer writer = getWriter( destFile );
             try {
                 CssCompressor cssCompressor = new CssCompressor( reader );
                 cssCompressor.compress(writer, maxColumnWidth);
@@ -233,11 +239,11 @@ public class YuiCompressorTask extends Task {
      * or to either of the files.
      */
     private void compressJs(File srcFile, File destFile) throws IOException {
-        Reader reader = new FileReader( srcFile );
+        Reader reader = getReader( srcFile );
         try {
-            Writer writer = new FileWriter( destFile );
+            Writer writer = getWriter( destFile );
             try {
-                JavaScriptCompressor compressor = new JavaScriptCompressor(reader, new AntErrorReporter( this.getProject() ) );
+                JavaScriptCompressor compressor = new JavaScriptCompressor(reader, new AntErrorReporter(this.getProject()));
                 compressor.compress( writer, maxColumnWidth, munge, warn, preserveAllSemiColons, preserveStringLiterals );
             } finally {
                 writer.close();
@@ -246,5 +252,17 @@ public class YuiCompressorTask extends Task {
         finally {
             reader.close();
         }
+    }
+
+    private Reader getReader(File file) throws IOException {
+        return (charset == null) ?
+                new InputStreamReader(new FileInputStream(file)) :
+                new InputStreamReader(new FileInputStream(file), charset);
+    }
+
+    private Writer getWriter(File file) throws IOException {
+        return (charset == null) ?
+                new OutputStreamWriter(new FileOutputStream(file)) :
+                new OutputStreamWriter(new FileOutputStream(file), charset);
     }
 } 
